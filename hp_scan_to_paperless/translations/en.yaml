@@ -1,0 +1,34 @@
+configuration:
+  printer_ip:
+    name: Printer IP Address
+    description: Recommended in add-on containers. Example: 192.168.1.50.
+  printer_name:
+    name: Printer Name
+    description: Optional network name lookup if printer_ip is not set.
+  output_directory:
+    name: Output Directory
+    description: Folder where scanned files are saved.
+  resolution:
+    name: Scan Resolution (DPI)
+    description: Typical values are 200 or 300.
+  mode:
+    name: Scan Mode
+    description: Color or Gray.
+  duplex:
+    name: Duplex Scan
+    description: Enables duplex scanning if your device supports it.
+  pdf:
+    name: Force PDF Output
+    description: When enabled, always save scan output as PDF.
+  prefer_escl:
+    name: Prefer eSCL
+    description: Use eSCL protocol when available.
+  file_pattern:
+    name: Filename Pattern
+    description: Optional naming pattern used by node-hp-scan-to.
+  keep_files:
+    name: Keep Local Files
+    description: Keep created files locally after processing.
+  debug:
+    name: Debug Logging
+    description: Enable verbose logs.

@@ -1,0 +1,40 @@
+name: HP Scan to Paperless Trigger
+version: "0.1.0"
+slug: hp_scan_to_paperless
+description: Trigger an HP scan on demand and save files into the Paperless consume folder.
+url: https://github.com/manuc66/node-hp-scan-to
+startup: application
+boot: auto
+arch:
+  - aarch64
+  - armv7
+  - amd64
+host_network: true
+stdin: true
+map:
+  - type: share
+    read_only: false
+options:
+  printer_ip: null
+  printer_name: null
+  output_directory: /share/paperless/consume
+  resolution: 300
+  mode: Color
+  duplex: false
+  pdf: true
+  prefer_escl: false
+  file_pattern: scan_yyyy-mm-dd_HH-MM-ss
+  keep_files: true
+  debug: false
+schema:
+  printer_ip: "str?"
+  printer_name: "str?"
+  output_directory: "str"
+  resolution: "int(75,600)"
+  mode: "list(Color|Gray)"
+  duplex: "bool"
+  pdf: "bool"
+  prefer_escl: "bool"
+  file_pattern: "str?"
+  keep_files: "bool"
+  debug: "bool"
