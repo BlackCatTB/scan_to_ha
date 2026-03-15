@@ -10,6 +10,30 @@ is_value_set() {
     [[ -n "${value}" && "${value}" != "null" ]]
 }
 
+trim_whitespace() {
+    local value="${1:-}"
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+    printf '%s' "${value}"
+}
+
+strip_wrapping_quotes() {
+    local value="${1:-}"
+
+    case "${value}" in
+        \"*\")
+            value="${value#\"}"
+            value="${value%\"}"
+            ;;
+        \'*\')
+            value="${value#\'}"
+            value="${value%\'}"
+            ;;
+    esac
+
+    printf '%s' "${value}"
+}
+
 build_target_args() {
     TARGET_ARGS=()
 
@@ -139,10 +163,16 @@ print_help() {
 
 handle_command() {
     local raw_command="${1:-}"
+    local normalized_command=""
     local command=""
     local target_override=""
 
-    read -r command target_override _ <<<"${raw_command}"
+    normalized_command="$(trim_whitespace "${raw_command}")"
+    normalized_command="$(strip_wrapping_quotes "${normalized_command}")"
+
+    read -r command target_override _ <<<"${normalized_command}"
+    command="$(strip_wrapping_quotes "$(trim_whitespace "${command}")")"
+    target_override="$(strip_wrapping_quotes "$(trim_whitespace "${target_override}")")"
     command="${command,,}"
 
     case "${command}" in

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Fix stdin parsing when Supervisor sends quoted input values like `"scan"`
+- Accept both quoted and unquoted trigger commands
+
 ## 0.1.1
 
 - Fix startup behavior to avoid requiring printer target at container boot
