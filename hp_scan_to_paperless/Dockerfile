@@ -9,7 +9,7 @@ RUN apk add --no-cache \
     npm \
     && npm install --global --omit=dev node-hp-scan-to
 
-# Register as an s6-overlay service so s6 (PID 1) manages the process
-RUN mkdir -p /etc/services.d/hp_scan
-COPY run.sh /etc/services.d/hp_scan/run
-RUN chmod a+x /etc/services.d/hp_scan/run
+COPY run.sh /run.sh
+RUN chmod a+x /run.sh
+
+CMD [ "/run.sh" ]

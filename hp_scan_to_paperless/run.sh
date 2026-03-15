@@ -178,6 +178,7 @@ fi
 while true; do
     if read -r -t 3600 command_line; then
         command_line="${command_line%$'\r'}"
+        bashio::log.info "Received stdin command: ${command_line}"
         handle_command "${command_line}"
     fi
 done
