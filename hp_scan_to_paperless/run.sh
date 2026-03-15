@@ -29,8 +29,26 @@ build_target_args() {
         return
     fi
 
-    bashio::log.fatal "Set either printer_ip or printer_name in the add-on options."
-    exit 1
+    bashio::log.error "No printer target configured. Set printer_ip or printer_name, or trigger with an explicit IP (example: scan 192.168.1.50)."
+    return 1
+}
+
+has_target_config() {
+    local printer_ip
+    local printer_name
+
+    printer_ip="$(bashio::config 'printer_ip')"
+    printer_name="$(bashio::config 'printer_name')"
+
+    if is_value_set "${printer_ip}"; then
+        return 0
+    fi
+
+    if is_value_set "${printer_name}"; then
+        return 0
+    fi
+
+    return 1
 }
 
 build_scan_args() {
@@ -78,7 +96,14 @@ build_scan_args() {
 }
 
 run_single_scan() {
-    build_target_args
+    local target_override="${1:-}"
+
+    if is_value_set "${target_override}"; then
+        TARGET_ARGS=(--address "${target_override}")
+    elif ! build_target_args; then
+        return
+    fi
+
     build_scan_args
 
     bashio::log.info "Triggering single scan job..."
@@ -87,7 +112,13 @@ run_single_scan() {
 }
 
 clear_registrations() {
-    build_target_args
+    local target_override="${1:-}"
+
+    if is_value_set "${target_override}"; then
+        TARGET_ARGS=(--address "${target_override}")
+    elif ! build_target_args; then
+        return
+    fi
 
     local extra_args=()
     if bashio::config.true 'debug'; then
@@ -108,14 +139,18 @@ print_help() {
 
 handle_command() {
     local raw_command="${1:-}"
-    local command="${raw_command,,}"
+    local command=""
+    local target_override=""
+
+    read -r command target_override _ <<<"${raw_command}"
+    command="${command,,}"
 
     case "${command}" in
         ""|scan|single-scan|trigger)
-            run_single_scan
+            run_single_scan "${target_override}"
             ;;
         clear|clear-registrations)
-            clear_registrations
+            clear_registrations "${target_override}"
             ;;
         help)
             print_help
@@ -132,10 +167,13 @@ if [[ -z "${APP_BIN}" || ! -x "${APP_BIN}" ]]; then
     exit 1
 fi
 
-build_target_args
-
 bashio::log.info "HP Scan to Paperless Trigger add-on started."
 bashio::log.info "Use Home Assistant service hassio.addon_stdin with input 'scan' to trigger a scan."
+bashio::log.info "You can also pass an IP in the input, for example: 'scan 192.168.1.50'."
+
+if ! has_target_config; then
+    bashio::log.warning "No printer is configured yet. Set printer_ip/printer_name in options or pass the IP in the stdin command."
+fi
 
 while true; do
     if read -r -t 3600 command_line; then
